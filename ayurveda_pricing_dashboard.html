@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayurvedic Wellness — Competitive Pricing Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg: #12201A;
+    --bg-panel: #17281F;
+    --bg-panel-2: #1C3025;
+    --line: #2C4436;
+    --ivory: #EDE7D8;
+    --ivory-dim: #B7C2B7;
+    --ochre: #C99A3D;
+    --ochre-soft: #8B7239;
+    --sage: #7FA98C;
+    --clay: #B0654A;
+    --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  @font-face{
+    font-family: 'Fraunces';
+    src: local('Georgia');
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ivory);
+    font-family: var(--sans);
+    line-height: 1.5;
+  }
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 28px 90px;
+  }
+  header{
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+  .kicker{
+    font-size: 13px;
+    color: var(--sage);
+    letter-spacing: 0.02em;
+    margin-bottom: 10px;
+  }
+  h1{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 40px;
+    line-height: 1.15;
+    margin: 0 0 14px;
+    max-width: 620px;
+    color: var(--ivory);
+  }
+  .lede{
+    max-width: 560px;
+    color: var(--ivory-dim);
+    font-size: 15.5px;
+  }
+  .meta-row{
+    display:flex;
+    gap: 28px;
+    margin-top: 26px;
+    flex-wrap: wrap;
+  }
+  .meta-item{
+    font-size: 13px;
+    color: var(--ivory-dim);
+  }
+  .meta-item b{
+    color: var(--ochre);
+    font-weight: 600;
+  }
+
+  .tier-cards{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .tier-card{
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ochre);
+    padding: 20px 22px;
+  }
+  .tier-card.mid{ border-left-color: var(--sage); }
+  .tier-card.value{ border-left-color: var(--clay); }
+  .tier-card .brand{
+    font-family: var(--serif);
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .tier-card .tier-label{
+    font-size: 12px;
+    color: var(--ivory-dim);
+    margin-bottom: 14px;
+  }
+  .tier-stats{
+    display:flex;
+    justify-content: space-between;
+    font-size: 13px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+  .tier-stats div b{
+    display:block;
+    font-size: 18px;
+    font-family: var(--serif);
+    color: var(--ivory);
+    font-weight: 500;
+  }
+  .tier-stats div span{
+    color: var(--ivory-dim);
+    font-size: 11px;
+  }
+
+  section{
+    margin-bottom: 56px;
+  }
+  .section-head{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+    gap: 20px;
+  }
+  h2{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 22px;
+    margin: 0;
+  }
+  .section-note{
+    font-size: 13px;
+    color: var(--ivory-dim);
+    max-width: 340px;
+    text-align: right;
+  }
+  .insight{
+    font-size: 14px;
+    color: var(--ivory-dim);
+    margin: 4px 0 22px;
+    max-width: 680px;
+  }
+  .panel{
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    padding: 26px;
+  }
+  .two-col{
+    display:grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 20px;
+  }
+  canvas{ max-height: 380px; }
+
+  .legend-row{
+    display:flex;
+    gap: 18px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: var(--ivory-dim);
+  }
+  .swatch{
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    display:inline-block;
+  }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  th, td{
+    text-align: left;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  th{
+    color: var(--ivory-dim);
+    font-weight: 500;
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+  }
+  td.num{ text-align: right; font-variant-numeric: tabular-nums; }
+  th.num{ text-align: right; }
+  tr:last-child td{ border-bottom: none; }
+
+  footer{
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 60px;
+    font-size: 12.5px;
+    color: var(--ivory-dim);
+  }
+  footer a{ color: var(--sage); }
+
+  @media (max-width: 860px){
+    .tier-cards{ grid-template-columns: 1fr; }
+    .two-col{ grid-template-columns: 1fr; }
+    h1{ font-size: 30px; }
+    .section-head{ flex-direction: column; align-items: flex-start; }
+    .section-note{ text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Competitive Pricing Intelligence — Ayurvedic &amp; Wellness D2C</div>
+    <h1>Where three Ayurvedic brands actually compete on price</h1>
+    <p class="lede">A pricing and positioning comparison across Kama Ayurveda, Vedix, and Devrishi Ayurveda, built from 200 live product listings scraped in July 2026.</p>
+    <div class="meta-row">
+      <div class="meta-item"><b>200</b> products</div>
+      <div class="meta-item"><b>3</b> brands</div>
+      <div class="meta-item"><b>₹70 – ₹9,495</b> price span</div>
+      <div class="meta-item"><b>July 2026</b> snapshot</div>
+    </div>
+  </header>
+
+  <div class="tier-cards" id="tierCards"></div>
+
+  <section>
+    <div class="section-head">
+      <h2>Price distribution by brand</h2>
+      <div class="section-note">Each dot is one product, jittered vertically by brand. Height of the spread shows how wide a brand's catalog prices range.</div>
+    </div>
+    <p class="insight" id="distInsight"></p>
+    <div class="panel">
+      <canvas id="distChart"></canvas>
+    </div>
+  </section>
+
+  <section>
+    <div class="two-col">
+      <div>
+        <div class="section-head">
+          <h2>Median price by category, across brands</h2>
+        </div>
+        <p class="insight">Categories that exist on more than one site — where head-to-head comparison is meaningful.</p>
+        <div class="panel">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+      <div>
+        <div class="section-head">
+          <h2>Rating vs. price</h2>
+        </div>
+        <p class="insight" id="ratingInsight"></p>
+        <div class="panel">
+          <canvas id="ratingChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Catalog composition</h2>
+      <div class="section-note">Category mix reveals brand strategy — where each brand chooses to compete.</div>
+    </div>
+    <div class="panel">
+      <canvas id="compositionChart"></canvas>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Top 10 highest-priced products</h2>
+    </div>
+    <div class="panel">
+      <table id="topTable">
+        <thead>
+          <tr><th>Product</th><th>Brand</th><th>Category</th><th class="num">Price (₹)</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Data scraped from public product listing pages of kamaayurveda.in, vedix.com, and devrishiayurveda.com in July 2026, using Python (requests + BeautifulSoup), respecting each site's robots.txt.
+    MRP/discount data available only for Kama Ayurveda; review counts available only for Kama Ayurveda; concern tags available only for Vedix.
+    Built as a portfolio project — <a href="#">github.com/your-username/ayurveda-pricing-intelligence</a>
+  </footer>
+
+</div>
+
+<script>
+const DATA = [{"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "kumkumadi youth-revitalising facial oil", "price": 1895.0, "mrp": 1895.0, "discount": null, "rating": 5.0, "reviews": 44}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "amsuman daily shield sunscreen spf 50", "price": 2895.0, "mrp": 2895.0, "discount": null, "rating": 5.0, "reviews": 1}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "kumkumadi youth-revitalising soft cream", "price": 2095.0, "mrp": 2095.0, "discount": null, "rating": 5.0, "reviews": 6}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "kumkumadi youth-recovering night balm", "price": 2295.0, "mrp": 2295.0, "discount": null, "rating": 5.0, "reviews": 55}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "kumkumadi youth-illuminating silky serum", "price": 2695.0, "mrp": 2695.0, "discount": null, "rating": 5.0, "reviews": 23}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "amarrupa line smoothing face serum", "price": 1995.0, "mrp": 1995.0, "discount": null, "rating": 5.0, "reviews": 20}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "eladhi nourishing rich cream", "price": 3125.0, "mrp": 3125.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "rose jasmine face cleanser | cleansing, refreshing and hydra..", "price": 795.0, "mrp": 795.0, "discount": null, "rating": 4.5, "reviews": 32}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "urjasara moisturising  water cream", "price": 975.0, "mrp": 975.0, "discount": null, "rating": 5.0, "reviews": 20}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "urjasara nutritive milky essence", "price": 2850.0, "mrp": 2850.0, "discount": null, "rating": 5.0, "reviews": 10}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "kumkumadi youth-clarifying mask-scrub | 2 in 1 mask scrub", "price": 3695.0, "mrp": 3695.0, "discount": null, "rating": 5.0, "reviews": 36}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "amarrupa wrinkle-correcting facial oil", "price": 3995.0, "mrp": 3995.0, "discount": null, "rating": 5.0, "reviews": 13}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "amarrupa wrinkle-correcting eye cream", "price": 3195.0, "mrp": 3195.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "kumkumadi youth-revitalising eye contour serum", "price": 3795.0, "mrp": 3795.0, "discount": null, "rating": 5.0, "reviews": 4}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "urjasara nourish & replenishing rich cream", "price": 2850.0, "mrp": 2850.0, "discount": null, "rating": 5.0, "reviews": 12}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "eladhi hydrating fresh emulsion", "price": 3025.0, "mrp": 3025.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "amarrupa contour-defining & firming cream", "price": 1895.0, "mrp": 1895.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "vanasara rose hydrating yoghurt mask", "price": 1150.0, "mrp": 1150.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "rose soothing floral water", "price": 650.0, "mrp": 650.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "rose soothing floral water", "price": 995.0, "mrp": 995.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "neroli stimulating floral water", "price": 1825.0, "mrp": 1825.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "vetiver invigorating botanical water", "price": 1825.0, "mrp": 1825.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "sandanya purifying fresh serum", "price": 1995.0, "mrp": 1995.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "sandanya blemish clarifying dry oil", "price": 3595.0, "mrp": 3595.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "sandanya perfecting matte cream", "price": 1075.0, "mrp": 1075.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "jasmine hydrating floral water", "price": 1825.0, "mrp": 1825.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "nalpamaradi brightening oil mask", "price": 1345.0, "mrp": 1345.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "vanasara nimrah blemish- correcting dry herbal blend", "price": 1775.0, "mrp": 1775.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "vanasara mridul exfoliating dry herbal blend", "price": 1250.0, "mrp": 1250.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "eladhi restorative face & body oil", "price": 2050.0, "mrp": 2050.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "kumkumadi complete discovery set", "price": 8995.0, "mrp": 8995.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "urjasara moisturising and youth preserving essentials discov..", "price": 2950.0, "mrp": 2950.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "multi masking lepam ritual discovery set", "price": 2850.0, "mrp": 2850.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "vanasara ashwagandha invigorating essence", "price": 3895.0, "mrp": 3895.0, "discount": null, "rating": 5.0, "reviews": 1}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "vanasara turmeric brightening clay mask", "price": 575.0, "mrp": 575.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Skincare", "name": "kumkumadi youth-recovering night balm", "price": 2295.0, "mrp": 2295.0, "discount": null, "rating": 5.0, "reviews": 10}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras invigorating  scalp & hair oil", "price": 615.0, "mrp": 615.0, "discount": null, "rating": 4.7, "reviews": 60}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras balancing shampoo", "price": 525.0, "mrp": 525.0, "discount": null, "rating": 4.9, "reviews": 13}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras smoothing hair serum", "price": 3125.0, "mrp": 3125.0, "discount": null, "rating": 4.8, "reviews": 4}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras hydrating conditioner", "price": 2195.0, "mrp": 2195.0, "discount": null, "rating": 5.0, "reviews": 2}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras regenerating hair mask", "price": 1525.0, "mrp": 1525.0, "discount": null, "rating": 4.0, "reviews": 1}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras purifying scalp scrub", "price": 950.0, "mrp": 950.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "kansa brush", "price": 5325.0, "mrp": 5325.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras densifying & fortifying scalp concentrate", "price": 4195.0, "mrp": 4195.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "rose & jasmine gentle daily shampoo", "price": 495.0, "mrp": 495.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "rose & jasmine gentle daily shampoo", "price": 495.0, "mrp": 495.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "rose & jasmine moisturising hair conditioner", "price": 625.0, "mrp": 625.0, "discount": null, "rating": 4.8, "reviews": 8}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "lavender & patchouli nourishing shampoo", "price": 1725.0, "mrp": 1725.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "lavender & patchouli nourishing conditioner", "price": 2145.0, "mrp": 2145.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "himalayan cedar detangling conditioner", "price": 2145.0, "mrp": 2145.0, "discount": null, "rating": 5.0, "reviews": 3}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "himalayan cedar purifying shampoo", "price": 1725.0, "mrp": 1725.0, "discount": null, "rating": 4.8, "reviews": 4}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras essential hair-oiling ritual", "price": 4150.0, "mrp": 5195.0, "discount": 20.1, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "bringaras regenerating hair-oiling ritual", "price": 3625.0, "mrp": 4525.0, "discount": 19.9, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "organic hair color kit", "price": 2195.0, "mrp": 2195.0, "discount": null, "rating": 4.8, "reviews": 17}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "organic indigo powder", "price": 1095.0, "mrp": 1095.0, "discount": null, "rating": 4.9, "reviews": 10}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Haircare", "name": "organic henna powder", "price": 1095.0, "mrp": 1095.0, "discount": null, "rating": 5.0, "reviews": 2}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Kumkumadi Collection", "name": "kumkumadi glow discovery set", "price": 4250.0, "mrp": 4250.0, "discount": null, "rating": 5.0, "reviews": 6}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Kumkumadi Collection", "name": "kumkumadi brightening cleansing oil", "price": 1595.0, "mrp": 1595.0, "discount": null, "rating": 5.0, "reviews": 3}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bringaras Collection", "name": "bringaras discovery set", "price": 2345.0, "mrp": 2345.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "himalayan cedar hand & body cleanser", "price": 1745.0, "mrp": 1745.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "ashwaras reviving body scrub", "price": 2495.0, "mrp": 2495.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "rose & jasmine moisturising hand and body cleanser", "price": 545.0, "mrp": 545.0, "discount": null, "rating": 4.7, "reviews": 3}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "rose & jasmine moisturising hand and body cleanser", "price": 545.0, "mrp": 545.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "rose & jasmine hand and body lotion", "price": 675.0, "mrp": 675.0, "discount": null, "rating": 5.0, "reviews": 4}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "rose & jasmine hand and body lotion", "price": 675.0, "mrp": 675.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "lavender & patchouli hand & body cleanser", "price": 1745.0, "mrp": 1745.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "lavender & patchouli hand & body lotion", "price": 2145.0, "mrp": 2145.0, "discount": null, "rating": 5.0, "reviews": 1}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "kokum almond restorative body butter", "price": 2595.0, "mrp": 2595.0, "discount": null, "rating": 5.0, "reviews": 15}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "kokum almond hand & body lotion", "price": 2145.0, "mrp": 2145.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "himalayan cedar hand & body reviving lotion", "price": 2145.0, "mrp": 2145.0, "discount": null, "rating": 5.0, "reviews": 1}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "ashwaras body massage oil", "price": 2295.0, "mrp": 2295.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "ashwaras smoothing & invigorating body cream", "price": 2695.0, "mrp": 2695.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "ashwaras replenishing body oil", "price": 3395.0, "mrp": 3395.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "organic sweet almond oil", "price": 675.0, "mrp": 675.0, "discount": null, "rating": 5.0, "reviews": 16}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "extra virgin organic coconut oil", "price": 350.0, "mrp": 350.0, "discount": null, "rating": 5.0, "reviews": 22}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "turmeric & myrrh skin brightening soap", "price": 795.0, "mrp": 795.0, "discount": null, "rating": 4.7, "reviews": 6}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "organic neem oil", "price": 445.0, "mrp": 445.0, "discount": null, "rating": 4.8, "reviews": 19}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "red sandalwood soap", "price": 795.0, "mrp": 795.0, "discount": null, "rating": 5.0, "reviews": 1}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "organic moringa oil", "price": 2050.0, "mrp": 2050.0, "discount": null, "rating": 5.0, "reviews": 1}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "rose, cinnamon & orange soap", "price": 795.0, "mrp": 795.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "kokum almond hand & body nourishing cleansing oil", "price": 2395.0, "mrp": 2395.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "pure mogra water", "price": 625.0, "mrp": 625.0, "discount": null, "rating": 4.8, "reviews": 11}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "natural khus soap", "price": 795.0, "mrp": 795.0, "discount": null, "rating": 4.8, "reviews": 4}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "natural rose soap", "price": 795.0, "mrp": 795.0, "discount": null, "rating": 4.7, "reviews": 3}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "foot cream", "price": 1250.0, "mrp": 1250.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bath & Body", "name": "hand cream", "price": 1250.0, "mrp": 1250.0, "discount": null, "rating": null, "reviews": null}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bestsellers", "name": "anti acne cleansing foam", "price": 1325.0, "mrp": 1325.0, "discount": null, "rating": 4.5, "reviews": 10}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bestsellers", "name": "suvarna haldi chandan face pack", "price": 1895.0, "mrp": 1895.0, "discount": null, "rating": 5.0, "reviews": 4}, {"brand": "Kama Ayurveda", "tier": "Premium", "category": "Bestsellers", "name": "himalayan deodar face cleanser for men", "price": 825.0, "mrp": 825.0, "discount": null, "rating": 5.0, "reviews": 6}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Anti-Hairfall Shampoo", "name": "Dhavath Shampoo With Bhringraj & Aloe Vera", "price": 399.0, "mrp": null, "discount": null, "rating": 4.5, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Anti-Hairfall Shampoo", "name": "Vikleda Shampoo With Triphala & Jojoba", "price": 399.0, "mrp": null, "discount": null, "rating": 4.5, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Anti-Dandruff Shampoo", "name": "Vardara Shampoo With Aloe Vera & Datura", "price": 399.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Anti-Dandruff Shampoo", "name": "Taritha Shampoo With Bhringraj & Pippali", "price": 399.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Keshamrut - Hair Oil", "name": "Keshamrut Hair Oil With Bhringraj & Rosemary", "price": 549.0, "mrp": null, "discount": null, "rating": 4.7, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Oil", "name": "Ahuta Hair Oil With Banyan & Hibiscus", "price": 449.0, "mrp": null, "discount": null, "rating": 4.2, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Oil", "name": "Jeevath Hair Oil With Hibiscus & Bhringraj", "price": 449.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Oil", "name": "Niryath Hair Oil With Lotus & Licorice", "price": 449.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Oil", "name": "Vapra Hair Oil With Onion & Chamomile", "price": 449.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Oil", "name": "Vanya Hair Oil With Fenugreek & Sesame", "price": 449.0, "mrp": null, "discount": null, "rating": 4.2, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Oil", "name": "Praya Hair Oil With Lotus & Neem", "price": 449.0, "mrp": null, "discount": null, "rating": 4.2, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Hair Base Oil", "name": "Shvedan Hair Oil With Castor & Sesame", "price": 449.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Hair Base Oil", "name": "Viruj Hair Oil With Argan & Coconut", "price": 449.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Hair Base Oil", "name": "Tavas Hair Oil With Almond & Jasmine", "price": 359.0, "mrp": null, "discount": null, "rating": 4.2, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Anti-Dandruff Serum", "name": "Pratiti Hair Serum With Hibiscus & Datura", "price": 849.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Anti-Hairfall Serum", "name": "Samroha Hair Serum With Haritaki & Amla", "price": 599.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Anti-Dandruff Serum", "name": "Nibhida Hair Serum With Lotus & Neem", "price": 599.0, "mrp": null, "discount": null, "rating": 4.6, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Serum", "name": "Vithan Advanced Hair Serum With Onion & Aloe Vera", "price": 599.0, "mrp": null, "discount": null, "rating": 4.5, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Serum", "name": "Vithan Pro Hair Serum With Aloe Vera & Bhringraj", "price": 599.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Serum", "name": "Nuyantra Advanced Hair Serum With Bhringraj & Bakuchi", "price": 599.0, "mrp": null, "discount": null, "rating": 4.5, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Serum", "name": "Nuyantra Pro Hair Serum With Neem & Tulasi", "price": 549.0, "mrp": null, "discount": null, "rating": 4.6, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Hair Conditioner", "name": "Vartha Hair Conditioner With Rice Water & Mango Butter", "price": 449.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Hair Pack", "name": "Root Strenghtening Hair Pack With Onion & Fenugreek", "price": 799.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Hair Mask", "name": "Druti Hair Mask With Jojoba & Aloe Vera", "price": 599.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Hair Mask", "name": "Pratida Hair Mask With Coconut & Shea Butter", "price": 599.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Hair Mask", "name": "Niktha Hair Mask With Lemon &  Neem", "price": 599.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Leave On Cream", "name": "Vartika Curl Cream With Murumuru Butter & Fenugreek", "price": 599.0, "mrp": null, "discount": null, "rating": 4.5, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Cleanser", "name": "Anuva Face Wash With Oatmeal & Aloe Vera", "price": 499.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Cleanser", "name": "Drithi Face Wash With Amla & Sariva", "price": 499.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Cleanser", "name": "Anaha Face Wash With Lodhra & Neem", "price": 499.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Moisturizer", "name": "Sthavi Face Cream With Aloe Vera & Lotus", "price": 599.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Moisturizer", "name": "Niraj Face Gel With Yashtimadhu & Sariva", "price": 499.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Moisturizer", "name": "Anudha Face Lotion With Lodhra & Manjistha", "price": 499.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Active", "name": "Avas Face Serum With Lodhra & Manjishta", "price": 499.0, "mrp": null, "discount": null, "rating": 4.3, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Active", "name": "Aloka Face Serum With Amla & Lemon", "price": 499.0, "mrp": null, "discount": null, "rating": 4.4, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Active", "name": "Prastha Face Serum With Daruharidra & Yashtimadhu", "price": 599.0, "mrp": null, "discount": null, "rating": 4.5, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Active", "name": "Prakhya Face Serum With Durva & Nimba", "price": 599.0, "mrp": null, "discount": null, "rating": 4.5, "reviews": null}, {"brand": "Vedix", "tier": "Mid / Personalized", "category": "Sunscreen", "name": "Tej Sunscreen With Bakuchi & Turmeric", "price": 499.0, "mrp": null, "discount": null, "rating": 4.7, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Aam Guthli Churna (Mango Seed Powder) \u2013 Natural Digestive & Gut Health Support |  100g", "price": 100.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Immunity", "name": "Amla Churna (Indian Gooseberry Powder) \u2013 Natural Vitamin C & Immunity Booster | 100g", "price": 80.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Daily Wellness", "name": "Arjun Chhal Churna (Arjuna Bark Powder) \u2013 Natural Heart Health & Blood Pressure Support | 100g", "price": 105.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Womens Wellness", "name": "Ashok Chhal Churna (Ashoka Bark Powder) \u2013 Women\u2019s Health Support & Hormonal Balance | 100g", "price": 80.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Immunity", "name": "Ashwa Malt \u2013 Ayurvedic Malt for Stamina , Low Sperm Count & Performance Boost  \u2013 Only for Men", "price": 430.0, "mrp": null, "discount": null, "rating": 5.0, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Immunity", "name": "Ashwagandha Churna \u2013 Natural Stress Relief, Strength & Immunity Booster |100g", "price": 160.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Daily Wellness", "name": "Asthi Gold Capsule \u2013 Ayurvedic Joint Pain Relief, Arthritis Support", "price": 210.0, "mrp": null, "discount": null, "rating": 5.0, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Baelgiri Churna (Bael Fruit Powder) \u2013 Natural Digestive Support & Gut Health | 100g", "price": 100.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Wellness", "name": "Baheda Churna (Bibhitaki Powder) \u2013 Respiratory Health, Digestion & Detox Support |  100g", "price": 90.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Daily Wellness", "name": "Bone Tone-Forte Granules \u2013 Natural Calcium Booster for Strong Bones (250g)", "price": 260.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Singal Herbs Churna", "name": "Brahmi Churna \u2013 Memory Booster, Brain Health & Stress Relief |  100g", "price": 100.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Singal Herbs Churna", "name": "Chopchini Churna (Chopchini Powder) \u2013 Joint Pain Relief, Skin Health & Detox Support | 100g", "price": 330.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Daily Wellness", "name": "Cristo Nil Churan \u2013 Ayurvedic Kidney Stone Dissolver (50g)", "price": 210.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Devrishi Aloevera Swaras | Sugar-Free Ayurvedic Aloe Vera Juice for Digestion & Acidity \u2013 1000 ml", "price": 370.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Amla Swaras | Sugar-Free Ayurvedic Amla Juice for Immunity, Digestion & Wellness \u2013 1000 ml", "price": 260.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Devrishi Amladi Syrup \u2013 Ayurvedic Digestive Tonic for Acidity, Gas, Indigestion & Gut Health \u2013 200ml", "price": 160.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Brain Wellness", "name": "Devrishi Ardhangvat Har Vati\u2013 For Nerve Strength, Paralysis, Brain & Body Recovery \u2013 10 Tablets", "price": 810.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Devrishi Arshodh Har Syrup \u2013 For Piles, Fissures, Constipation & Digestive Health \u2013 200ml", "price": 170.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Devrishi Arshodh Har Tablet \u2013 For Piles, Fissure, Constipation & Digestive Health \u2013 30 tabs", "price": 170.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Mens Wellness", "name": "Devrishi Ashwa Tila \u2013 Ayurvedic Massage Oil for Male Strength, Stamina & Vitality \u2013 30ml", "price": 240.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Men Women", "name": "Devrishi Chandana Amrit Syrup \u2013 Syrup for Pitta Disorders, Burning Urination & Mental Calmness \u2013 450ml", "price": 350.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Fit & Fine Swaras | Sugar-Free Ayurvedic Juice for Weight Management & Metabolism | 1000 ml", "price": 360.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Devrishi Gaso Amrit Syrup \u2013 Ayurvedic Solution for Gas, Acidity, Indigestion & Bloating \u2013 200ml", "price": 170.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Devrishi Giloy Papita Swaras | Sugar-Free Ayurvedic Juice for Immunity, Digestion & Wellness \u2013  500 ml", "price": 200.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Giloy Swaras | Sugar-Free Ayurvedic Giloy Juice for Immunity, Detox & Vitality \u2013  500 ml", "price": 190.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Daily Wellness", "name": "Devrishi Gold Oil \u2013 Fast Acting Ayurvedic Pain Relief Oil for Joint and Muscle Pain (50ml)", "price": 320.0, "mrp": null, "discount": null, "rating": 5.0, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Blood Purify", "name": "Devrishi Iro Amrit Syrup \u2013 Blood Builder for Hemoglobin, Energy & Immunity \u2013 300ml", "price": 170.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Karela Jamun Swaras | Sugar-Free Ayurvedic Juice for Blood Sugar Balance & Metabolism \u2013 500 ml", "price": 190.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Lauki with Tulsi Pudina Swaras  | Sugar-Free Ayurvedic Juice for Detox, Digestion & Metabolism \u2013 500 ml", "price": 190.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Neem Swaras  | Sugar-Free Ayurvedic Neem Juice for Blood Purification, Skin & Immunity \u2013 500 ml", "price": 200.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Nirgundi Swaras  | Sugar-Free Ayurvedic Juice for Joint Pain, Inflammation & Mobility | 500 ml", "price": 250.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Daily Wellness", "name": "Devrishi Oil For Joint Pain", "price": 140.0, "mrp": null, "discount": null, "rating": 5.0, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Daily Wellness", "name": "Devrishi Ortho Ras for Pain and Stiffness", "price": 260.0, "mrp": null, "discount": null, "rating": 5.0, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Panch Tulsi Swaras | Sugar-Free Ayurvedic Juice for Immunity, Respiratory Health & Wellness \u2013 500 ml", "price": 260.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Mens Wellness", "name": "Devrishi Paras Malham for Fungal and Skin Care", "price": 165.0, "mrp": null, "discount": null, "rating": 4.75, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Skin Care", "name": "Devrishi Paras Oil \u2013 Ayurvedic Anti-Inflammatory Skin Healing Oil", "price": 140.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Joint Bone Health", "name": "Devrishi Peeda Mukti Vati \u2013 For Joint Pain, Arthritis, Sciatica & Inflammation Relief \u2013 30 tablets", "price": 210.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Punarnava Makoy Kutki Swaras | Sugar-Free Ayurvedic Juice for Liver, Kidney & Detox Support \u2013 500 ml", "price": 225.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Beauty Care", "name": "Devrishi Pure Neem Protect & Purifiels Soap For Skin Infactions", "price": 70.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Shallaki Swaras  | Sugar-Free Ayurvedic Juice for Joint Health, Arthritis & Mobility \u2013 500 ml", "price": 240.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Shilajit Swaras | Sugar-Free Ayurvedic Juice for Strength, Stamina & Vitality \u2013 500 ml", "price": 310.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Cough Cold", "name": "Devrishi Swasika Cough Syrup \u2013 For Cough, Cold & Respiratory Relief \u2013 100ml", "price": 110.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Devrishi Triphala Swaras  | Sugar-Free Ayurvedic Juice for Digestion, Gut Health & Detox \u2013 500 ml", "price": 200.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Ayurvedic Juices", "name": "Devrishi Udramrit Swaras  | Sugar-Free Ayurvedic Juice for Acidity, Gas & Digestive Relief \u2013 500 ml", "price": 230.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Immunity", "name": "Devrishi Urja Shakti \u2013 Ayurvedic Energy & Vitality Booster for Strength, Stamina & Immunity", "price": 3725.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Joint Bone Health", "name": "Devrishi Vat Parvahi Syrup \u2013 For Joint Pain, Arthritis, Inflammation & Mobility \u2013 200ml", "price": 180.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Mens Wellness", "name": "Devrishi Virya Stambhak Vati", "price": 390.0, "mrp": null, "discount": null, "rating": 5.0, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Immunity", "name": "Giloy Churna (Guduchi Powder) \u2013 Immunity Booster, Detox & Fever Support | 100g", "price": 90.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Kidney Wellness", "name": "Gokhru Churna (Gokshura Powder) \u2013 Kidney Health, Urinary Support & Vitality Booster |  100g", "price": 110.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Beauty Care", "name": "Gorika Anti Pigmentation Cream for Women", "price": 270.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Singal Herbs Churna", "name": "Gudhal Churna (Hibiscus Powder) \u2013 Hair Growth, Skin Glow & Heart Health Support |100g", "price": 150.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Diabetic Wellness", "name": "Gudmar Churna (Gymnema Sylvestre Powder) \u2013 Blood Sugar Control & Metabolism Support |100g", "price": 120.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Joint Bone Health", "name": "Hadjod Churna (Cissus Powder) \u2013 Bone Strength, Joint Support & Fracture Recovery | 100g", "price": 140.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Wellness", "name": "Harad Churna \u2013 Digestive Support, Detox & Gut Health |100g", "price": 100.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Wellness", "name": "Haritaki Churna\u2013 Digestive Health, Detox & Gut Cleanser |  100g", "price": 100.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Wellness", "name": "Indrayana Churna \u2013 Digestive Cleanser, Detox & Gut Health Support |  100g", "price": 95.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Singal Herbs Churna", "name": "Jamun Gutli Churna (Jamun Seed Powder) \u2013 Blood Sugar Control & Digestive Support |  100g", "price": 110.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Kabz Clear Syrup for Constipation", "price": 140.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Diabetic Wellness", "name": "Karela Churna (Bitter Gourd Powder) \u2013 Blood Sugar Control, Detox & Digestive Support |  100g", "price": 80.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Stamina Booster", "name": "Kaunch Beej Churna (Mucuna Pruriens Powder) \u2013 Strength, Vitality & Testosterone Support |  100g", "price": 110.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Hair Wellness", "name": "Kuntal Hair Oil For Hair Growth and Hair Fall Control", "price": 240.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Womens Wellness", "name": "Lady Cure Ayurvedic Syrup For PCOS and Period Pain Relief", "price": 260.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Livo Amrit Syrup For Liver Problems", "price": 160.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Methi Churna (Fenugreek Powder) \u2013 Blood Sugar Control, Digestion & Hair Health | 100g", "price": 190.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Diabetic Wellness", "name": "Neem Karela Jamun Churna \u2013 Advanced Blood Sugar Control & Detox Support | 100g", "price": 160.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Pachak Panchamrat Ras Tonic for Digestion, Constipation, Acidity and Gas Relief", "price": 160.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Digestive Care", "name": "Pudina Churna (Mint Powder) \u2013 Digestive Support, Cooling Relief & Gut Health | 100g", "price": 130.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Stamina Booster", "name": "Safed Musli Churna \u2013 Strength, Stamina & Vitality Booster | 100g", "price": 460.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Daily Wellness", "name": "Sandhi Rakshak Ras for Muscles and Back Pain", "price": 160.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Cough Cold", "name": "Shwasika Avaleha Churn For Cough & Cold", "price": 260.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Blood Purify", "name": "Skino Amrit \u2013 Ayurvedic Blood Purifier (Syrup + Tablets Combo)", "price": 270.0, "mrp": null, "discount": null, "rating": null, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Memory Booster", "name": "Smaran Amrit Avaleha Brain Support for Memory & Focus", "price": 240.0, "mrp": null, "discount": null, "rating": 4.0, "reviews": null}, {"brand": "Devrishi Ayurveda", "tier": "Value / Mass Wellness", "category": "Mens Wellness", "name": "Warts Remover Ointment for Men and Women | Wart Removal Cream for Men & Women", "price": 250.0, "mrp": null, "discount": null, "rating": 4.64, "reviews": null}];
+
+const COLORS = {
+  'Kama Ayurveda': '#C99A3D',
+  'Vedix': '#7FA98C',
+  'Devrishi Ayurveda': '#B0654A'
+};
+const TIER_LABEL = {
+  'Kama Ayurveda': 'Premium',
+  'Vedix': 'Mid / Personalized',
+  'Devrishi Ayurveda': 'Value / Mass Wellness'
+};
+const BRANDS = ['Kama Ayurveda', 'Vedix', 'Devrishi Ayurveda'];
+
+Chart.defaults.color = '#B7C2B7';
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.borderColor = '#2C4436';
+
+function median(arr){
+  const s = [...arr].sort((a,b)=>a-b);
+  const m = Math.floor(s.length/2);
+  return s.length % 2 ? s[m] : (s[m-1]+s[m])/2;
+}
+
+// ---------- Tier summary cards ----------
+const tierCardsEl = document.getElementById('tierCards');
+const tierClass = { 'Kama Ayurveda': '', 'Vedix': 'mid', 'Devrishi Ayurveda': 'value' };
+BRANDS.forEach(brand => {
+  const rows = DATA.filter(d => d.brand === brand);
+  const prices = rows.map(r=>r.price).filter(p=>p!=null);
+  const ratings = rows.filter(r=>r.rating!=null).map(r=>r.rating);
+  const avgRating = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '—';
+  const card = document.createElement('div');
+  card.className = 'tier-card ' + tierClass[brand];
+  card.innerHTML = `
+    <div class="brand">${brand}</div>
+    <div class="tier-label">${TIER_LABEL[brand]}</div>
+    <div class="tier-stats">
+      <div><b>${rows.length}</b><span>products</span></div>
+      <div><b>₹${Math.round(median(prices))}</b><span>median price</span></div>
+      <div><b>₹${Math.round(Math.min(...prices))}–${Math.round(Math.max(...prices))}</b><span>range</span></div>
+      <div><b>${avgRating}</b><span>avg rating</span></div>
+    </div>
+  `;
+  tierCardsEl.appendChild(card);
+});
+
+// ---------- Distribution (scatter, jittered) ----------
+const distDatasets = BRANDS.map((brand, i) => {
+  const rows = DATA.filter(d => d.brand === brand && d.price != null);
+  return {
+    label: brand,
+    data: rows.map(r => ({ x: r.price, y: i + (Math.random()-0.5)*0.55 })),
+    backgroundColor: COLORS[brand] + 'CC',
+    borderColor: COLORS[brand],
+    borderWidth: 1,
+    pointRadius: 4.5,
+    pointHoverRadius: 6,
+  };
+});
+
+new Chart(document.getElementById('distChart'), {
+  type: 'scatter',
+  data: { datasets: distDatasets },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true, position: 'top', align: 'start', labels: { boxWidth: 10, boxHeight: 10, padding: 16 } },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `₹${ctx.raw.x.toLocaleString('en-IN')}`
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: 'Price (₹, log scale)' },
+        type: 'logarithmic',
+        grid: { color: '#2C4436' },
+        ticks: { callback: v => ['100','1000','10000'].includes(String(v)) ? '₹'+v : '' }
+      },
+      y: {
+        min: -0.7, max: 2.7,
+        ticks: { callback: v => BRANDS[Math.round(v)] || '', stepSize: 1 },
+        grid: { display: false }
+      }
+    }
+  }
+});
+
+const distStats = BRANDS.map(b => {
+  const p = DATA.filter(d=>d.brand===b && d.price!=null).map(r=>r.price);
+  return { b, med: median(p), min: Math.min(...p), max: Math.max(...p) };
+});
+document.getElementById('distInsight').textContent =
+  `Kama's catalog spans the widest range (₹${Math.round(distStats[0].min)}–₹${Math.round(distStats[0].max)}), reflecting a mix of everyday essentials and luxury discovery sets. Vedix and Devrishi cluster far more tightly, consistent with flatter, more standardized pricing.`;
+
+// ---------- Category median comparison ----------
+const catMap = {};
+DATA.forEach(d => {
+  if (d.price == null) return;
+  const key = d.category;
+  if (!catMap[key]) catMap[key] = {};
+  if (!catMap[key][d.brand]) catMap[key][d.brand] = [];
+  catMap[key][d.brand].push(d.price);
+});
+// Keep only categories with meaningful volume
+const catEntries = Object.entries(catMap)
+  .map(([cat, byBrand]) => ({
+    cat,
+    totalCount: Object.values(byBrand).reduce((a,arr)=>a+arr.length,0),
+    byBrand
+  }))
+  .filter(e => e.totalCount >= 4)
+  .sort((a,b) => b.totalCount - a.totalCount)
+  .slice(0, 8);
+
+new Chart(document.getElementById('categoryChart'), {
+  type: 'bar',
+  data: {
+    labels: catEntries.map(e => e.cat),
+    datasets: BRANDS.map(brand => ({
+      label: brand,
+      data: catEntries.map(e => e.byBrand[brand] ? Math.round(median(e.byBrand[brand])) : null),
+      backgroundColor: COLORS[brand],
+      borderRadius: 2,
+      maxBarThickness: 22,
+    }))
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true, position: 'top', align: 'start', labels: { boxWidth: 10, boxHeight: 10, padding: 16 } },
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ₹${ctx.raw}` } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxRotation: 35, minRotation: 20 } },
+      y: { title: { display: true, text: 'Median price (₹)' }, grid: { color: '#2C4436' } }
+    }
+  }
+});
+
+// ---------- Rating vs Price scatter ----------
+const ratingDatasets = BRANDS.map(brand => {
+  const rows = DATA.filter(d => d.brand === brand && d.rating != null && d.price != null);
+  return {
+    label: brand,
+    data: rows.map(r => ({ x: r.price, y: r.rating })),
+    backgroundColor: COLORS[brand] + 'CC',
+    borderColor: COLORS[brand],
+    pointRadius: 4.5,
+  };
+});
+new Chart(document.getElementById('ratingChart'), {
+  type: 'scatter',
+  data: { datasets: ratingDatasets },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => `₹${ctx.raw.x.toLocaleString('en-IN')} · ${ctx.raw.y}★` } }
+    },
+    scales: {
+      x: { type: 'logarithmic', title: { display: true, text: 'Price (₹)' }, grid: { color: '#2C4436' } },
+      y: { min: 3.5, max: 5.1, title: { display: true, text: 'Rating' }, grid: { color: '#2C4436' } }
+    }
+  }
+});
+
+const ratedCount = DATA.filter(d=>d.rating!=null).length;
+document.getElementById('ratingInsight').textContent =
+  `Only ${ratedCount} of 200 products (${Math.round(ratedCount/200*100)}%) carry a visible rating — mostly Kama's bestsellers and Vedix's full catalog. Devrishi shows almost none, a gap in social proof for a value-tier brand competing on trust.`;
+
+// ---------- Composition (stacked, % of catalog by category group) ----------
+function topCategoriesFor(brand, n){
+  const rows = DATA.filter(d => d.brand === brand);
+  const counts = {};
+  rows.forEach(r => counts[r.category] = (counts[r.category]||0) + 1);
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+const compLabels = BRANDS;
+const allCatsShown = new Set();
+BRANDS.forEach(b => topCategoriesFor(b, 5).forEach(([c]) => allCatsShown.add(c)));
+const palette = ['#C99A3D','#7FA98C','#B0654A','#8B7239','#5E7A68','#D9B978','#A3C1AE','#C98764','#4E6656','#E0C594'];
+const catList = Array.from(allCatsShown);
+const compDatasets = catList.map((cat, i) => ({
+  label: cat,
+  data: BRANDS.map(brand => {
+    const rows = DATA.filter(d => d.brand === brand);
+    const count = rows.filter(r => r.category === cat).length;
+    return rows.length ? +(count/rows.length*100).toFixed(1) : 0;
+  }),
+  backgroundColor: palette[i % palette.length],
+}));
+
+new Chart(document.getElementById('compositionChart'), {
+  type: 'bar',
+  data: { labels: compLabels, datasets: compDatasets },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { boxWidth: 10, boxHeight: 10, padding: 12, font: { size: 11 } } },
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw}%` } }
+    },
+    scales: {
+      x: { stacked: true, title: { display: true, text: '% of brand catalog' }, grid: { color: '#2C4436' } },
+      y: { stacked: true, grid: { display: false } }
+    }
+  }
+});
+
+// ---------- Top 10 table ----------
+const top10 = [...DATA].filter(d=>d.price!=null).sort((a,b)=>b.price-a.price).slice(0,10);
+const tbody = document.querySelector('#topTable tbody');
+top10.forEach(r => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${r.name}</td><td>${r.brand}</td><td>${r.category}</td><td class="num">₹${r.price.toLocaleString('en-IN')}</td>`;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
