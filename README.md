@@ -2,7 +2,7 @@
 
 A web scraping + data analysis project that builds a pricing intelligence pipeline across three Indian Ayurvedic/wellness D2C brands, spanning premium, mid-tier, and value market positions.
 
-**[🔗 View live dashboard](https://yourusername.github.io/ayurveda-pricing-intelligence/dashboard/ayurveda_pricing_dashboard.html)**
+**[🔗 View live dashboard](https://vallabhvibhu07.github.io/ayurvedic_brands_price_comparison/ayurveda_pricing_dashboard.html)**
 
 ## Why this project
 
