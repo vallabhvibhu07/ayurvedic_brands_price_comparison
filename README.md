@@ -74,6 +74,6 @@ Each script writes its own CSV to the working directory. Open `dashboard/ayurved
 
 ## About
 
-Built by [Your Name], MBA in Business Analytics @ IIM Ranchi. Part of a data science portfolio connecting business strategy with hands-on technical execution.
+Built by Vallabh Vibhu, MBA in Business Analytics @ IIM Ranchi. Part of a data science portfolio connecting business strategy with hands-on technical execution.
 
-[LinkedIn](#) · [Portfolio](#)
+[LinkedIn](https://www.linkedin.com/in/vallabh-vibhu56/) · [Portfolio](#)
